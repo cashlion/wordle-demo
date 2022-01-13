@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body
+    style="
+      font-size: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    "
+  >
+    <div style="margin: 100px auto; width: 50%" x-data="Wordle()" x-init="chooseWord()">
+      <ul>
+        <template x-for="e in entries">
+          <li>
+            <template x-for="l in e">
+              <span x-text="l.letter" :style="`color: ${l.color}`"></span>
+            </template>
+          </li>
+        </template>
+      </ul>
+
+      <input
+        type="text"
+        x-model="entry"
+        @keyup.enter="checkWord()"
+        style="font-size: 24px; width: 100%;"
+      />
+
+      <button @click="reset()" x-show="resetBtn" style="margin-top: 15px; float:right;">Play Again</button>
+    </div>
+    <script type="module" src="/main.js"></script>
+
+    <script>
+      function Wordle() {
+        return {
+          resetBtn: false,
+          entry: "",
+          entries: [],
+          word: null,
+          words: ["abuse","adult","agent","anger","apple","award","basis","beach","birth","block","blood","board","brain","bread","break","brown","buyer","cause","chain","chair","chest","chief","child","china","claim","class","clock","coach","coast","court","cover","cream","crime","cross","crowd","crown","cycle","dance","death","depth","doubt","draft","drama","dream","dress","drink","drive","earth","enemy","entry","error","event","faith","fault","field","fight","final","floor","focus","force","frame","frank","front","fruit","glass","grant","grass","green","group","guide","heart","henry","horse","hotel","house","image","index","input","issue","japan","jones","judge","knife","laura","layer","level","lewis","light","limit","lunch","major","march","match","metal","model","money","month","motor","mouth","music","night","noise","north","novel","nurse","offer","order","other","owner","panel","paper","party","peace","peter","phase","phone","piece","pilot","pitch","place","plane","plant","plate","point","pound","power","press","price","pride","prize","proof","queen","radio","range","ratio","reply","right","river","round","route","rugby","scale","scene","scope","score","sense","shape","share","sheep","sheet","shift","shirt","shock","sight","simon","skill","sleep","smile","smith","smoke","sound","south","space","speed","spite","sport","squad","staff","stage","start","state","steam","steel","stock","stone","store","study","stuff","style","sugar","table","taste","terry","theme","thing","title","total","touch","tower","track","trade","train","trend","trial","trust","truth","uncle","union","unity","value","video","visit","voice","waste","watch","water","while","white","whole","woman","world","youth"],
+
+          checkWord() {
+            if (this.entry.length < 5) {
+              alert("Word must be at least 5 characters long");
+              return;
+            }
+
+            let letters = this.entry.split("");
+
+            if (this.entry.toLowerCase() === this.word.toLowerCase()) {
+              alert("You won!");
+
+              this.entries.push(
+                letters.reduce((acc, cur) => {
+                  acc.push({ color: "green", letter: cur.toUpperCase() });
+                  return acc;
+                }, [])
+              );
+
+              this.entry = "";
+
+              this.resetBtn = true;
+
+              return;
+            }
+
+            this.entries.push(
+              letters.reduce((acc, cur, idx) => {
+                let color = "gray";
+
+                if (this.word.toLowerCase().includes(cur.toLowerCase())) {
+                  color = "orange";
+                }
+
+                if (this.word.toLowerCase()[idx] === cur.toLowerCase()) {
+                  color = "green";
+                }
+
+                acc.push({ color, letter: cur.toUpperCase() });
+                return acc;
+              }, [])
+            );
+
+            if (this.entries.length > 5) {
+              alert("You lost!");
+              this.resetBtn = true;
+              return;
+            }
+
+            this.entry = "";
+          },
+
+          chooseWord() {
+            this.word =
+              this.words[Math.floor(Math.random() * this.words.length)];
+          },
+
+          reset() {
+            this.resetBtn = false;
+            this.entries = [];
+            this.entry = "";
+            this.chooseWord();
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
